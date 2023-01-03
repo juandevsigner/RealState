@@ -1,0 +1,30 @@
+extends ../layout/index
+
+block content
+    div.py-10
+        h1.text-4xl.my-5.font-bold.text-center Real
+            span.font-normal State
+        if errors 
+            div(class="max-w-md mx-auto my-10")
+                each error in errors
+                    p.bg-red-500.text-white.capitalize.text-xs.text-center.p-2.mb-1.font-semibold= error.msg
+        div.mt-8.mx-auto.max-w-md
+            div.bg-white.py-8.px-4.shadow-sm.rounded-md
+                h2.text-center.text-2xl.font-semibold.mb-2= page 
+                form.space-y-5(method="POST" action="/auth/register" noValidate)
+                    input(type="hidden" name="_csrf" value= csrfToken)
+                    div
+                        label.block.text-sm.capitalize.text-gray-400(for="name") Your Name
+                        input#name.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300.capitalize(placeholder="Put Your Name" type="text" name="name" value=user ? user.name : '')
+                    div
+                        label.block.text-sm.capitalize.text-gray-400(for="email") Your Email
+                        input#email.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Put Your Email" type="email" name="email" value=user ? user.email : '')
+                    div
+                        label.block.text-sm.capitalize.text-gray-400(for="password") Your Password
+                        input#password.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Put Your Password" type="password" name="password")
+                    div
+                        label.block.text-sm.capitalize.text-gray-400(for="password2") Repeat Your Password
+                        input#password2.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Repeat Your Password" type="password" name="password2")
+                    input( class="w-full text-white font-bold py-2 rounded-sm bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer transition-all ease-in-out" type="submit" value="Create Account")
+                    div.text-center.text-sm.text-gray-500
+                        a(href="/auth/login")  Have You Account? Login Now   

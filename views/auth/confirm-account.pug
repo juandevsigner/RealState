@@ -1,0 +1,12 @@
+extends ../layout/index
+
+block content
+    div.py-10
+        h1.text-4xl.my-5.font-bold.text-center Real
+            span.font-normal State
+        h2.text-center.text-2xl.font-semibold.mb-2.text-green-500= page
+    div(class="bg-white shadow-md py-8 px-4 rounded-md max-w-md mx-auto")
+        p(class= error? 'bg-red-500' : 'bg-green-500').py-2.px-5.rounded-md.w-full.text-white.text-center.capitalize= msg 
+
+        if !error
+            a(href="/auth/login" class="text-center font-semibold text-sm text-slate-600 capitalize mt-100 bock") Login Now!

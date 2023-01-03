@@ -1,0 +1,21 @@
+extends ../layout/index
+
+block content
+    div.py-10
+        h1.text-4xl.my-5.font-bold.text-center Real
+            span.font-normal State
+
+        div.mt-8.mx-auto.max-w-md
+            div.bg-white.py-8.px-4.shadow-sm.rounded-md
+                h2.text-center.text-2xl.font-semibold.mb-2= page 
+                form.space-y-5
+                    div
+                        label.block.text-sm.capitalize.text-gray-400(for="email") Your Email
+                        input#email.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Put Your Email" type="email" name="email")
+                    div
+                        label.block.text-sm.capitalize.text-gray-400(for="password") Your Password
+                        input#password.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Put Your Password" type="password" name="password")
+                    input( class="w-full text-white font-bold py-2 rounded-sm bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer transition-all ease-in-out" type="submit" value="Login")
+                    div.flex.items-center.justify-between.text-sm.text-gray-500
+                        a(href="/auth/register")  Dont Have You Account? Register Now   
+                        a(href="/auth/reset-password")  I Forgot Password 
