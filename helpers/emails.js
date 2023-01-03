@@ -10,15 +10,6 @@ const emailRegister = async (data) => {
     },
   });
 
-  // const transport = nodemailer.createTransport({
-  //   host: "smtp.gmail.com",
-  //   port: 465,
-  //   secure: true,
-  //   auth: {
-  //     user: "juanda.core07@gmail.com",
-  //     pass: "uwnylmkcrufhcaci",
-  //   },
-  // });
 
   const { email, name, token } = data;
 
