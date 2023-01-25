@@ -1,7 +1,8 @@
 import { check, validationResult } from "express-validator";
+import bcrypt from "bcrypt";
 import { createId } from "../helpers/tokens.js";
 import User from "../models/User.js";
-import { emailRegister } from "../helpers/emails.js";
+import { emailRegister, emailResetPassword } from "../helpers/emails.js";
 
 //VIEWS
 const formLogin = (req, res) => {
@@ -20,6 +21,7 @@ const formRegister = (req, res) => {
 const resetPassword = (req, res) => {
   res.render("auth/reset-password", {
     page: "Reset Password",
+    csrfToken: req.csrfToken(),
   });
 };
 
@@ -109,4 +111,102 @@ const confirm = async (req, res) => {
   });
 };
 
-export { formLogin, formRegister, resetPassword, register, confirm };
+const resetPasswordEndPoint = async (req, res) => {
+  await check("email").isEmail().withMessage("Email no valid").run(req);
+
+  let result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    return res.render("auth/reset-password", {
+      page: "Reset Password",
+      csrfToken: req.csrfToken(),
+      errors: result.array(),
+    });
+  }
+
+  const { email } = req.body;
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return res.render("auth/reset-password", {
+      page: "Reset Password",
+      csrfToken: req.csrfToken(),
+      errors: [{ msg: "Email does not exist" }],
+    });
+  }
+
+  user.token = createId();
+  await user.save();
+  emailResetPassword({
+    email: user.email,
+    name: user.name,
+    token: user.token,
+  });
+
+  res.render("templates/message", {
+    msg: "Reset Password",
+    page: "We seend you an email with instructions",
+  });
+};
+
+const checkToken = async (req, res) => {
+  const { token } = req.params;
+  const user = await User.findOne({ where: { token } });
+  console.log(user);
+  if (!user) {
+    return res.render("auth/confirm-account", {
+      page: "Reset Password",
+      msg: "Error to confirm your account, try again later",
+      error: true,
+    });
+  }
+
+  res.render("auth/change-password", {
+    page: "Change Password",
+    csrfToken: req.csrfToken(),
+  });
+};
+
+const newPassword = async (req, res) => {
+  await check("password")
+    .isLength({ min: 6 })
+    .withMessage("Password should be at least 6 characters")
+    .run(req);
+
+  let result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    return res.render("auth/change-password", {
+      page: "Change Password",
+      csrfToken: req.csrfToken(),
+      errors: result.array(),
+    });
+  }
+
+  const { token } = req.params;
+  const { password } = req.body;
+
+  const user = await User.findOne({ where: { token } });
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(password, salt);
+  user.token = null;
+
+  await user.save();
+
+  res.render("auth/confirm-account", {
+    page: "Change Password Correctly",
+    msg: "New Password Save",
+  });
+};
+
+export {
+  formLogin,
+  formRegister,
+  resetPassword,
+  register,
+  confirm,
+  resetPasswordEndPoint,
+  checkToken,
+  newPassword,
+};

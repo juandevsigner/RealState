@@ -10,7 +10,6 @@ const emailRegister = async (data) => {
     },
   });
 
-
   const { email, name, token } = data;
 
   await transport.sendMail({
@@ -29,4 +28,32 @@ const emailRegister = async (data) => {
   });
 };
 
-export { emailRegister };
+const emailResetPassword = async (data) => {
+  const transport = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const { email, name, token } = data;
+
+  await transport.sendMail({
+    from: "Real State",
+    to: email,
+    subject: "Reset Password",
+    text: `Reset Password`,
+    html: `<p>Hello ${name},\n\nYou need change your password</p>
+        <p>Follow link to create a new password:
+        <a href="${process.env.BACKEND_URL}:${
+      process.env.PORT ?? 3000
+    }/auth/reset-password/${token}">Change password</a></p>
+
+        <p>If you did not create this account please ignore this email</p>
+    `,
+  });
+};
+
+export { emailRegister, emailResetPassword };

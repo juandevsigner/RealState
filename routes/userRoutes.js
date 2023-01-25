@@ -5,6 +5,9 @@ import {
   resetPassword,
   register,
   confirm,
+  resetPasswordEndPoint,
+  checkToken,
+  newPassword,
 } from "../controller/userController.js";
 
 const router = Router();
@@ -15,5 +18,9 @@ router.post("/register", register);
 router.get("/confirm/:token", confirm);
 
 router.get("/reset-password", resetPassword);
+router.post("/reset-password", resetPasswordEndPoint);
+
+router.get("/reset-password/:token", checkToken);
+router.post("/reset-password/:token", newPassword);
 
 export default router;
