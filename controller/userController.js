@@ -1,6 +1,6 @@
 import { check, validationResult } from "express-validator";
 import bcrypt from "bcrypt";
-import { createId } from "../helpers/tokens.js";
+import { createId, createJWT } from "../helpers/tokens.js";
 import User from "../models/User.js";
 import { emailRegister, emailResetPassword } from "../helpers/emails.js";
 
@@ -8,6 +8,7 @@ import { emailRegister, emailResetPassword } from "../helpers/emails.js";
 const formLogin = (req, res) => {
   res.render("auth/login", {
     page: "Login",
+    csrfToken: req.csrfToken(),
   });
 };
 
@@ -153,7 +154,7 @@ const resetPasswordEndPoint = async (req, res) => {
 const checkToken = async (req, res) => {
   const { token } = req.params;
   const user = await User.findOne({ where: { token } });
-  console.log(user);
+
   if (!user) {
     return res.render("auth/confirm-account", {
       page: "Reset Password",
@@ -200,6 +201,63 @@ const newPassword = async (req, res) => {
   });
 };
 
+const validateUser = async (req, res) => {
+  await check("email").isEmail().withMessage("Email no valid").run(req);
+
+  await check("password")
+    .notEmpty()
+    .withMessage("Password is required")
+    .run(req);
+
+  let result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    return res.render("auth/login", {
+      page: "Login",
+      csrfToken: req.csrfToken(),
+      errors: result.array(),
+    });
+  }
+
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return res.render("auth/login", {
+      page: "Login",
+      csrfToken: req.csrfToken(),
+      errors: [{ msg: "User not found" }],
+    });
+  }
+
+  if (!user.confirm) {
+    return res.render("auth/login", {
+      page: "Login",
+      csrfToken: req.csrfToken(),
+      errors: [{ msg: "User not confirmed" }],
+    });
+  }
+
+  if (user.verifyPassword(password)) {
+    return res.render("auth/login", {
+      page: "Login",
+      csrfToken: req.csrfToken(),
+      errors: [{ msg: "Password is not valid" }],
+    });
+  }
+
+  const token = createJWT({ id: user.id, name: user.name });
+
+  return res
+    .cookie("_token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: true,
+    })
+    .redirect("/my-propertys");
+};
+
 export {
   formLogin,
   formRegister,
@@ -209,4 +267,5 @@ export {
   resetPasswordEndPoint,
   checkToken,
   newPassword,
+  validateUser,
 };

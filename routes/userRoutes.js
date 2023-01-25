@@ -8,13 +8,17 @@ import {
   resetPasswordEndPoint,
   checkToken,
   newPassword,
+  validateUser,
 } from "../controller/userController.js";
 
 const router = Router();
 
 router.get("/login", formLogin);
+router.post("/login", validateUser);
+
 router.get("/register", formRegister);
 router.post("/register", register);
+
 router.get("/confirm/:token", confirm);
 
 router.get("/reset-password", resetPassword);
