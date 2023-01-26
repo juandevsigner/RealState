@@ -6,8 +6,12 @@
   "type": "module",
   "scripts": {
     "start": "nodemon app.js",
-    "dev": "nodemon app.js",
-    "css": "postcss public/css/tailwind.css -o public/css/app.css --watch"
+    "server": "nodemon app.js",
+    "css": "postcss public/css/tailwind.css -o public/css/app.css --watch",
+    "js": "webpack --watch",
+    "dev": "concurrently \"npm run css\" \"npm run js\" \"nodemon app.js\" ",
+    "db:import": "node ./seed/seeder.js -i",
+    "db:remove": "node ./seed/seeder.js -r"
   },
   "author": "juan devsigner",
   "license": "ISC",
@@ -26,9 +30,12 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.13",
+    "concurrently": "^7.6.0",
     "nodemon": "^2.0.20",
     "postcss": "^8.4.20",
     "postcss-cli": "^10.1.0",
-    "tailwindcss": "^3.2.4"
+    "tailwindcss": "^3.2.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }

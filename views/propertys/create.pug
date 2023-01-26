@@ -1,0 +1,89 @@
+extends ../layout/index
+
+block styles
+    link(rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css")
+
+block content
+    div.pb-3
+
+        if errors 
+            div(class="max-w-md mx-auto my-10")
+                each error in errors
+                    p.bg-red-500.text-white.capitalize.text-xs.text-center.p-2.mb-1.font-semibold= error.msg
+
+        div(class="bg-white shadow py-8 px-4 rounded mx-auto my-10 w-full md:w-4/5 lg:w-2/5")
+            form.space-y-5(method="POST" action="/my-propertys/create")
+                input(type="hidden" name="_csrf" value=csrfToken)
+                div
+                    h3.text-lg.leading-6.font-bold.text-gray-900.mb-2 General Info     
+                    p.text-gray-600.mb-2 Add Info about property to sale
+
+                    div.mb-2
+                        label.mb-2.block.text-sm.capitalize.text-gray-400(for="title") Title Ad
+                        input#title.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Put Your title ad" type="text" name="title" value=data.title ? data.title : "")
+                    
+                    div.mb-2
+                        label.mb-2.block.text-sm.capitalize.text-gray-400(for="description") Description Ad
+                        textarea#description.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(placeholder="Put Your description ad"  name="description")=value=data.description ? data.description : ""
+
+                    div.flex.justify-between.gap-2.mb-2
+
+                        div(style={width: "80%"}).mb-2
+                            label.mb-2.block.text-sm.capitalize.text-gray-400.w-full(for="category" ) Category
+                            select#category.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(name="category" )
+                                option(value="") - Choose -
+                                each category in categories
+                                    option(value=category.id selected= data.category ? data.category == category.id ? true : false : null )= category.name
+
+                        div(style={width: "80%"}).mb-2
+                            label.mb-2.block.text-sm.capitalize.text-gray-400.w-full(for="price" ) Price
+                            select#price.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(name="price" )
+                                option(value="") - Choose -
+                                each price in prices
+                                    option(value=price.id selected= data.price ? data.price == price.id ? true : false : null)= price.name
+                
+                    div.flex.justify-between.gap-2.mb-2
+
+                        div(style={width: "80%"}).mb-2
+                            label.mb-2.block.text-sm.capitalize.text-gray-400.w-full(for="rooms" ) Rooms
+                            select#rooms.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(name="rooms" )
+                                option(value="" ) - Choose -
+                                - let rooms = 1;
+                                    while rooms < 5
+                                        option(value=rooms selected= data.rooms ? data.rooms == rooms ? true : false : null) #{rooms++}
+
+
+                        div(style={width: "80%"}).mb-2
+                            label.mb-2.block.text-sm.capitalize.text-gray-400.w-full(for="parking" ) Parking
+                            select#parking.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(name="parking" )
+                                option(value="") - Choose -
+                                - let parking = 1;
+                                    while parking < 4
+                                        option(value=parking  selected= data.parking ? data.parking == parking ? true : false : null) #{parking++}
+
+                        div(style={width: "80%"}).mb-2
+                            label.mb-2.block.text-sm.capitalize.text-gray-400.w-full(for="wc" ) WC
+                            select#wc.w-full.px-3.py-2.border-b.border-gray-200.placeholder-gray-300(name="wc" )
+                                option(value="" ) - Choose -
+                                - let wc = 1;
+                                    while wc < 5
+                                        option(value=wc selected= data.wc ? data.wc == wc ? true : false : null) #{wc++}
+                    div.py-5.space-y-4                   
+                        h3.text-lg.leading-6.font-bold.text-gray-900.mb-2 Location    
+                        p.text-gray-600.mb-2 Put location on map
+                        #mapa.h-96
+
+                        div
+                            p.street= data.street ? data.street : '' 
+
+                        input(type="hidden" name="street" id="street" value= data.street ? data.street : '' )
+                        input(type="hidden" name="lat" id="lat" value= data.lat ? data.lat : '')
+                        input(type="hidden" name="lng" id="lng" value= data.lng ? data.lng : '')
+
+                    input(class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 rounded-sm text-white transition-all cursor-pointer" type="submit" value="Add Image")
+block scripts 
+    script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js")
+    script(src="https://unpkg.com/esri-leaflet@3.0.8/dist/esri-leaflet.js")
+    script(src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geosearch/2.7.0/bundle.min.js")
+    script(src="/js/map.js")
