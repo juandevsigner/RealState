@@ -1,0 +1,22 @@
+extends ../layout/admin
+
+block styles
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.css")
+    meta(name="csrf-token" content=csrfToken)
+
+block content
+    div.pb-3
+
+        h2.text-center.font-bold.capitalize.text-xl Upload Image: 
+            span.font-semibold= property.title
+
+        div(class="py-8 px-4 rounded mx-auto my-10 w-full md:w-4/5 lg:w-2/5")
+            form( id="image" class="dropzone my-5 border-dashed border-2 min:h-96 h-auto rounded-md flex-col justify-center items-center" method="POST" action=`/propertys/add-image/${property.id}` )
+                input(type="hidden" name="_csrf" value=csrfToken)
+
+            button( id="publish" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 rounded-sm text-white transition-all cursor-pointer" type="button") Publish Property
+
+                  
+block scripts 
+    script(src="/js/addImage.js")
+  

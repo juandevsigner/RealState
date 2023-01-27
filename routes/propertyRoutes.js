@@ -1,7 +1,14 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { admin, create, save } from "../controller/propertyController.js";
+import {
+  admin,
+  create,
+  save,
+  addImage,
+  saveImage,
+} from "../controller/propertyController.js";
 import routeLock from "../middleware/routeLock.js";
+import upload from "../middleware/uploadImage.js";
 
 const router = Router();
 
@@ -23,6 +30,15 @@ router.post(
   body("wc").isNumeric().withMessage("Choose a quantity of wc"),
   body("lat").notEmpty().withMessage("Put property on map"),
   save
+);
+
+router.get("/propertys/add-image/:id", routeLock, addImage);
+
+router.post(
+  "/propertys/add-image/:id",
+  routeLock,
+  upload.single("image"),
+  saveImage
 );
 
 export default router;

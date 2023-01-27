@@ -1,10 +1,10 @@
 import { validationResult } from "express-validator";
 import { Price, Category, Property } from "../models/index.js";
+import router from "../routes/propertyRoutes.js";
 
 const admin = async (req, res) => {
   res.render("propertys/admin", {
     page: "My Propertys",
-    header: true,
   });
 };
 
@@ -16,7 +16,6 @@ const create = async (req, res) => {
 
   res.render("propertys/create", {
     page: "Create Property",
-    header: true,
     csrfToken: req.csrfToken(),
     categories,
     prices,
@@ -35,7 +34,6 @@ const save = async (req, res) => {
 
     res.render("propertys/create", {
       page: "Create Property",
-      header: true,
       csrfToken: req.csrfToken(),
       categories,
       prices,
@@ -80,4 +78,53 @@ const save = async (req, res) => {
   }
 };
 
-export { admin, create, save };
+const addImage = async (req, res) => {
+  const { id } = req.params;
+
+  const property = await Property.findByPk(id);
+  if (!property) {
+    return res.redirect("/propertys");
+  }
+
+  if (property.public) {
+    return res.redirect("/propertys");
+  }
+
+  if (req.user.id.toString() !== property.userID.toString()) {
+    return res.redirect("/propertys");
+  }
+
+  res.render("propertys/add-image", {
+    page: `Add Image ${property.title}`,
+    csrfToken: req.csrfToken(),
+    property,
+  });
+};
+
+const saveImage = async (req, res, next) => {
+  const { id } = req.params;
+
+  const property = await Property.findByPk(id);
+  if (!property) {
+    return res.redirect("/propertys");
+  }
+
+  if (property.public) {
+    return res.redirect("/propertys");
+  }
+
+  if (req.user.id.toString() !== property.userID.toString()) {
+    return res.redirect("/propertys");
+  }
+
+  try {
+    property.image = req.file.filename;
+    property.public = 1;
+    await property.save();
+    next();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { admin, create, save, addImage, saveImage };
