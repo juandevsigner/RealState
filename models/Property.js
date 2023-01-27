@@ -46,8 +46,8 @@ const Property = db.define("propertys", {
   },
   public: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
     default: false,
+    allowNull: true,
   },
 });
 

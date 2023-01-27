@@ -1,13 +1,15 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import { admin, create, save } from "../controller/propertyController.js";
+import routeLock from "../middleware/routeLock.js";
 
 const router = Router();
 
-router.get("/my-propertys", admin);
-router.get("/my-propertys/create", create);
+router.get("/propertys", routeLock, admin);
+router.get("/propertys/create", routeLock, create);
 router.post(
-  "/my-propertys/create",
+  "/propertys/create",
+  routeLock,
   body("title").notEmpty().withMessage("Title is required"),
   body("description")
     .notEmpty()

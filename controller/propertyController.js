@@ -69,7 +69,12 @@ const save = async (req, res) => {
       street,
       lat,
       lng,
+      userID: req.user.id,
+      image: "",
+      public: false,
     });
+    const { id } = propertySave;
+    res.redirect(`/propertys/add-image/${id}`);
   } catch (error) {
     console.log(error);
   }
