@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { Price, Category, Property } from "../models/index.js";
-import router from "../routes/propertyRoutes.js";
+import { unlink } from "node:fs/promises";
 
 const admin = async (req, res) => {
   const { id } = req.user;
@@ -15,6 +15,7 @@ const admin = async (req, res) => {
   res.render("properties/admin", {
     page: "My Properties",
     properties,
+    csrfToken: req.csrfToken(),
   });
 };
 
@@ -137,4 +138,144 @@ const saveImage = async (req, res, next) => {
   }
 };
 
-export { admin, create, save, addImage, saveImage };
+const edit = async (req, res) => {
+  const { id } = req.params;
+
+  const property = await Property.findByPk(id);
+
+  if (!property) {
+    return res.redirect("/properties");
+  }
+
+  if (property.userID.toString() !== req.user.id.toString()) {
+    return res.redirect("/properties");
+  }
+
+  const [categories, prices] = await Promise.all([
+    Category.findAll(),
+    Price.findAll(),
+  ]);
+
+  console.log(property);
+
+  res.render("properties/edit", {
+    page: "Edit Property",
+    csrfToken: req.csrfToken(),
+    categories,
+    prices,
+
+    data: property,
+  });
+};
+
+const saveChanges = async (req, res) => {
+  let result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    const [categories, prices] = await Promise.all([
+      Category.findAll(),
+      Price.findAll(),
+    ]);
+
+    res.render("properties/edit", {
+      page: "Edit Property",
+      csrfToken: req.csrfToken(),
+      categories,
+      prices,
+      errors: result.array(),
+      data: req.body,
+    });
+  }
+
+  const { id } = req.params;
+  const property = await Property.findByPk(id);
+
+  if (!property) {
+    return res.redirect("/properties");
+  }
+
+  if (property.userID.toString() !== req.user.id.toString()) {
+    return res.redirect("/properties");
+  }
+
+  try {
+    const {
+      title,
+      description,
+      wc,
+      rooms,
+      price: priceID,
+      street,
+      lat,
+      lng,
+      category: categoryID,
+      parking,
+    } = req.body;
+
+    property.set({
+      title,
+      description,
+      wc,
+      rooms,
+      priceID,
+      street,
+      lat,
+      lng,
+      categoryID,
+      parking,
+    });
+
+    await property.save();
+
+    res.redirect("/properties");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteProperty = async (req, res) => {
+  const { id } = req.params;
+  const property = await Property.findByPk(id);
+
+  if (!property) {
+    return res.redirect("/properties");
+  }
+
+  if (property.userID.toString() !== req.user.id.toString()) {
+    return res.redirect("/properties");
+  }
+
+  await unlink(`public/uploads/${property.image}`);
+  await property.destroy();
+  res.redirect("/properties");
+};
+
+const showProperty = async (req, res) => {
+  const { id } = req.params;
+  const property = await Property.findByPk(id, {
+    include: [
+      { model: Price, as: "price" },
+      { model: Category, as: "category" },
+    ],
+  });
+  if (!property) {
+    return res.redirect("/404");
+  }
+
+  res.render("properties/show", {
+    property,
+    page: property.title,
+  });
+};
+
+export {
+  admin,
+  create,
+  save,
+  addImage,
+  saveImage,
+  edit,
+  saveChanges,
+  deleteProperty,
+  showProperty,
+};

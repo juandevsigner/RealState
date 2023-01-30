@@ -16,7 +16,7 @@ block content
                                 div(class="sm:w-1/4 md:w-1/6 lg:w-1/6")
                                     img(src=`uploads/${property.image}` alt=`${property.name}` class="w-full block") 
                                 div(class="sm:w-2/4 md:w-3/6 lg:w-4/6 space-y-2")
-                                    a(class="block text-2xl font-extrabold text-indigo-600 truncate" href="#")=property.title
+                                    a(class="block text-2xl font-extrabold text-indigo-600 truncate" href=`/property/${property.id}`)=property.title
 
                                     div(class="flex gap-2 items-center")
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-indigo-600">
@@ -34,9 +34,10 @@ block content
                                     form(action="")
                                         input( type="submit" class=`text-center w-full my-2 px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white ${property.public ? 'bg-green-200 text-green-800': 'bg-red-200 text-red-800'}` value=`${property.public ? 'Public': 'Not Public'}` )
 
-                                    a(href="" class="text-center w-full px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white bg-indigo-600 texxt-indigo-100") Edit
+                                    a(href=`/properties/edit/${property.id}` class="text-center w-full px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white bg-indigo-600 texxt-indigo-100") Edit
 
-                                    form(action="")
+                                    form( method="POST" action=`/properties/delete/${property.id}`)
+                                        input(type="hidden" name="_csrf" value=csrfToken)
                                         input( type="submit" class="text-center w-full my-2 px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white bg-red-500" value="Delete" )
                         
         else 
