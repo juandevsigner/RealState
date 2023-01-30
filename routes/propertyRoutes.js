@@ -12,10 +12,10 @@ import upload from "../middleware/uploadImage.js";
 
 const router = Router();
 
-router.get("/propertys", routeLock, admin);
-router.get("/propertys/create", routeLock, create);
+router.get("/properties", routeLock, admin);
+router.get("/properties/create", routeLock, create);
 router.post(
-  "/propertys/create",
+  "/properties/create",
   routeLock,
   body("title").notEmpty().withMessage("Title is required"),
   body("description")
@@ -32,10 +32,10 @@ router.post(
   save
 );
 
-router.get("/propertys/add-image/:id", routeLock, addImage);
+router.get("/properties/add-image/:id", routeLock, addImage);
 
 router.post(
-  "/propertys/add-image/:id",
+  "/properties/add-image/:id",
   routeLock,
   upload.single("image"),
   saveImage

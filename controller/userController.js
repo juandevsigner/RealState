@@ -255,7 +255,7 @@ const validateUser = async (req, res) => {
       secure: true,
       sameSite: true,
     })
-    .redirect("/propertys");
+    .redirect("/properties");
 };
 
 export {

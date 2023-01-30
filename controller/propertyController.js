@@ -3,8 +3,18 @@ import { Price, Category, Property } from "../models/index.js";
 import router from "../routes/propertyRoutes.js";
 
 const admin = async (req, res) => {
-  res.render("propertys/admin", {
-    page: "My Propertys",
+  const { id } = req.user;
+  const properties = await Property.findAll({
+    where: { userId: id },
+    include: [
+      { model: Category, as: "category" },
+      { model: Price, as: "price" },
+    ],
+  });
+
+  res.render("properties/admin", {
+    page: "My Properties",
+    properties,
   });
 };
 
@@ -14,7 +24,7 @@ const create = async (req, res) => {
     Price.findAll(),
   ]);
 
-  res.render("propertys/create", {
+  res.render("properties/create", {
     page: "Create Property",
     csrfToken: req.csrfToken(),
     categories,
@@ -32,7 +42,7 @@ const save = async (req, res) => {
       Price.findAll(),
     ]);
 
-    res.render("propertys/create", {
+    res.render("properties/create", {
       page: "Create Property",
       csrfToken: req.csrfToken(),
       categories,
@@ -72,7 +82,7 @@ const save = async (req, res) => {
       public: false,
     });
     const { id } = propertySave;
-    res.redirect(`/propertys/add-image/${id}`);
+    res.redirect(`/properties/add-image/${id}`);
   } catch (error) {
     console.log(error);
   }
@@ -83,18 +93,18 @@ const addImage = async (req, res) => {
 
   const property = await Property.findByPk(id);
   if (!property) {
-    return res.redirect("/propertys");
+    return res.redirect("/properties");
   }
 
   if (property.public) {
-    return res.redirect("/propertys");
+    return res.redirect("/properties");
   }
 
   if (req.user.id.toString() !== property.userID.toString()) {
-    return res.redirect("/propertys");
+    return res.redirect("/properties");
   }
 
-  res.render("propertys/add-image", {
+  res.render("properties/add-image", {
     page: `Add Image ${property.title}`,
     csrfToken: req.csrfToken(),
     property,
@@ -106,15 +116,15 @@ const saveImage = async (req, res, next) => {
 
   const property = await Property.findByPk(id);
   if (!property) {
-    return res.redirect("/propertys");
+    return res.redirect("/properties");
   }
 
   if (property.public) {
-    return res.redirect("/propertys");
+    return res.redirect("/properties");
   }
 
   if (req.user.id.toString() !== property.userID.toString()) {
-    return res.redirect("/propertys");
+    return res.redirect("/properties");
   }
 
   try {

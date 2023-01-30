@@ -27,7 +27,7 @@ Dropzone.options.image = {
     });
     dropzone.on("queuecomplete", function () {
       if (dropzone.getActiveFiles().length == 0) {
-        window.location.href = "/propertys";
+        window.location.href = "/properties";
       }
     });
   },
