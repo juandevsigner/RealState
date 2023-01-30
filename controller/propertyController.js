@@ -3,20 +3,48 @@ import { Price, Category, Property } from "../models/index.js";
 import { unlink } from "node:fs/promises";
 
 const admin = async (req, res) => {
-  const { id } = req.user;
-  const properties = await Property.findAll({
-    where: { userId: id },
-    include: [
-      { model: Category, as: "category" },
-      { model: Price, as: "price" },
-    ],
-  });
+  const { page: currentPage } = req.query;
 
-  res.render("properties/admin", {
-    page: "My Properties",
-    properties,
-    csrfToken: req.csrfToken(),
-  });
+  const RegExp = /^[1-9]$/;
+
+  if (!RegExp.test(currentPage)) {
+    return res.redirect("/properties?page=1");
+  }
+
+  try {
+    const { id } = req.user;
+
+    const limit = 5;
+    const offset = currentPage * limit - limit;
+
+    const [properties, total] = await Promise.all([
+      Property.findAll({
+        limit,
+        offset,
+        where: { userId: id },
+        include: [
+          { model: Category, as: "category" },
+          { model: Price, as: "price" },
+        ],
+      }),
+      Property.count({
+        where: { userId: id },
+      }),
+    ]);
+
+    res.render("properties/admin", {
+      page: "My Properties",
+      properties,
+      csrfToken: req.csrfToken(),
+      pages: Math.ceil(total / limit),
+      currentPage: Number(currentPage),
+      total,
+      offset,
+      limit,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const create = async (req, res) => {

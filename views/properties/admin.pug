@@ -39,6 +39,21 @@ block content
                                     form( method="POST" action=`/properties/delete/${property.id}`)
                                         input(type="hidden" name="_csrf" value=csrfToken)
                                         input( type="submit" class="text-center w-full my-2 px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white bg-red-500" value="Delete" )
-                        
+
+                dic(class="bg-white px-4 py-3 flex -items-center justify-between border-t border-gray-200 sm:px-6")
+                    div(class="flex-1 flex justify-between sm:hidden")  
+                        a(href=`/properties?page=${currentPage - 1}` class=`${currentPage === 1 && 'pointer-events-none'}  relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`) Previous
+                        a(href=`/properties?page=${currentPage + 1}` class=`${currentPage === pages && 'pointer-events-none'} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`) Next
+
+                    div(class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between")
+                        p(class="text-sm text-gray-700 gap-2 mr-2") Show 
+                            span(class="font-medium") #{offset + 1} to 
+                            span(class="font-medium") #{total < limit + offset ? total : limit + offset} of 
+                            span(class="font-medium") #{total} results
+                    div(class="hidden sm:block")
+                        nav(class="relative z-0 inline-flex shadow-ms rounded")
+                            - var p = 1;
+                                while p <= pages
+                                    a(href=`/properties?page=${p}` class=`relative inline-flex items-center border my-2 mx-1 px-4 py-2 text-sm font-medium rounded transition-all  ${currentPage == p ? 'bg-indigo-600 text-white border border-indigo-800' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-200' }`) #{p++}            
         else 
             p.text-center Dont have properties, you need go to "Publish Property" to create one
