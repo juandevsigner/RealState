@@ -1,6 +1,7 @@
 import { validationResult } from "express-validator";
-import { Price, Category, Property } from "../models/index.js";
+import { Price, Category, Property, Message, User } from "../models/index.js";
 import { unlink } from "node:fs/promises";
+import { isSeller, dateFormatter } from "../helpers/index.js";
 
 const admin = async (req, res) => {
   const { page: currentPage } = req.query;
@@ -25,6 +26,7 @@ const admin = async (req, res) => {
         include: [
           { model: Category, as: "category" },
           { model: Price, as: "price" },
+          { model: Message, as: "messages" },
         ],
       }),
       Property.count({
@@ -278,8 +280,50 @@ const deleteProperty = async (req, res) => {
   res.redirect("/properties");
 };
 
+const changeState = async (req, res) => {
+  const { id } = req.params;
+  const property = await Property.findByPk(id);
+
+  if (!property) {
+    return res.redirect("/properties");
+  }
+
+  if (property.userID.toString() !== req.user.id.toString()) {
+    return res.redirect("/properties");
+  }
+
+  property.public = !property.public;
+  await property.save();
+  res.json({
+    result: true,
+  });
+};
+
 const showProperty = async (req, res) => {
   const { id } = req.params;
+
+  const property = await Property.findByPk(id, {
+    include: [
+      { model: Price, as: "price" },
+      { model: Category, as: "category" },
+    ],
+  });
+  if (!property || !property.public) {
+    return res.redirect("/404");
+  }
+
+  res.render("properties/show", {
+    property,
+    page: property.title,
+    csrfToken: req.csrfToken(),
+    user: req.user,
+    isSeller: isSeller(req.user?.id, property.userID),
+  });
+};
+
+const sendMessage = async (req, res) => {
+  const { id } = req.params;
+
   const property = await Property.findByPk(id, {
     include: [
       { model: Price, as: "price" },
@@ -290,9 +334,52 @@ const showProperty = async (req, res) => {
     return res.redirect("/404");
   }
 
-  res.render("properties/show", {
-    property,
-    page: property.title,
+  let result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    res.render("properties/show", {
+      property,
+      page: property.title,
+      csrfToken: req.csrfToken(),
+      user: req.user,
+      isSeller: isSeller(req.user?.id, property.userID),
+      errors: result.array(),
+    });
+  }
+
+  const { message } = req.body;
+  const { id: propertyID } = req.params;
+  const { id: userID } = req.user;
+
+  await Message.create({ message, propertyID, userID });
+
+  res.redirect("/");
+};
+
+const viewMessages = async (req, res) => {
+  const { id } = req.params;
+  const property = await Property.findByPk(id, {
+    include: [
+      {
+        model: Message,
+        as: "messages",
+        include: [{ model: User.scope("deletePassword"), as: "user" }],
+      },
+    ],
+  });
+
+  if (!property) {
+    return res.redirect("/properties");
+  }
+
+  if (property.userID.toString() !== req.user.id.toString()) {
+    return res.redirect("/properties");
+  }
+
+  res.render("properties/messages", {
+    page: `Messages`,
+    messages: property.messages,
+    dateFormatter,
   });
 };
 
@@ -305,5 +392,8 @@ export {
   edit,
   saveChanges,
   deleteProperty,
+  changeState,
   showProperty,
+  sendMessage,
+  viewMessages,
 };

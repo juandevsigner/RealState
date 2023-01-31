@@ -9,8 +9,12 @@ import {
   saveChanges,
   edit,
   deleteProperty,
+  changeState,
   showProperty,
+  sendMessage,
+  viewMessages,
 } from "../controller/propertyController.js";
+import checkUser from "../middleware/checkUser.js";
 import routeLock from "../middleware/routeLock.js";
 import upload from "../middleware/uploadImage.js";
 
@@ -67,8 +71,23 @@ router.post(
 
 router.post("/properties/delete/:id", routeLock, deleteProperty);
 
+router.put("/properties/:id", routeLock, changeState);
+
 //PUBLIC PAGES
 
-router.get("/property/:id", showProperty);
+router.get("/property/:id", checkUser, showProperty);
+
+router.post(
+  "/property/:id",
+  checkUser,
+  body("message")
+    .isLength({ min: 10 })
+    .withMessage(
+      "The message is mandatory and must be at least 10 characters long."
+    ),
+  sendMessage
+);
+
+router.get("/messages/:id", routeLock, viewMessages);
 
 export default router;

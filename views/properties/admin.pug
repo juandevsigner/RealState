@@ -1,5 +1,8 @@
 extends ../layout/admin
 
+block styles
+    meta(name="csrf-token" content=csrfToken)
+
 block content
     div.py-10
         h1.text-4xl.my-5.font-bold.text-center Real
@@ -29,10 +32,12 @@ block content
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
                                         </svg>
                                         p(class="text-sm text-black font-semibold")=property.price.name
+                                    
+                                    a(href=`/messages/${property.id}` class="text-sm text-gray-600")= `(${property.messages.length}) Messages` 
+    
 
                                 div(class="w-full md:w-2/6 lg:w-1/6 flex flex-col gap-2")  
-                                    form(action="")
-                                        input( type="submit" class=`text-center w-full my-2 px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white ${property.public ? 'bg-green-200 text-green-800': 'bg-red-200 text-red-800'}` value=`${property.public ? 'Public': 'Not Public'}` )
+                                    button( data-property-id=`${property.id}` type="button" class=`change-state text-center w-full my-2 px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white ${property.public ? 'bg-green-200 text-green-800': 'bg-red-200 text-red-800'}`)=`${property.public ? 'Public': 'Not Public'}`
 
                                     a(href=`/properties/edit/${property.id}` class="text-center w-full px-5 py-2 text-xs font-semibold rounded cursor-pointer text-white bg-indigo-600 texxt-indigo-100") Edit
 
@@ -57,3 +62,6 @@ block content
                                     a(href=`/properties?page=${p}` class=`relative inline-flex items-center border my-2 mx-1 px-4 py-2 text-sm font-medium rounded transition-all  ${currentPage == p ? 'bg-indigo-600 text-white border border-indigo-800' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-200' }`) #{p++}            
         else 
             p.text-center Dont have properties, you need go to "Publish Property" to create one
+
+block scripts 
+    script(src="/js/changeState.js")

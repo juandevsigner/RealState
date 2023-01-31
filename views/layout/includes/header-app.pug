@@ -9,11 +9,16 @@ header.bg-indigo-600.p-2
             a(class="p-2" href="/auth/login") Login
 
 div(class="bg-indigo-700 py-5 hidden lg:block")
-    div(class="container mx-auto flex justify-between")
-        a(href="/category/1" class="text-sm font-bold uppercase text-white") Homes
-        a(href="/category/2" class="text-sm font-bold uppercase text-white") Departments
-        a(href="/category/3" class="text-sm font-bold uppercase text-white") Cellars
-        a(href="/category/4" class="text-sm font-bold uppercase text-white") Terrains
-        a(href="/category/5" class="text-sm font-bold uppercase text-white") Huts
-       
+    div(class="container mx-auto flex justify-between items-center")
+        nav(class="flex gap-4")
+            a(href="/category/1" class="text-sm font-bold uppercase text-white") Homes
+            a(href="/category/2" class="text-sm font-bold uppercase text-white") Departments
+            a(href="/category/3" class="text-sm font-bold uppercase text-white") Cellars
+            a(href="/category/4" class="text-sm font-bold uppercase text-white") Terrains
+            a(href="/category/5" class="text-sm font-bold uppercase text-white") Huts
+
+        form(action="/search" method="POST" class="flex gap-3 items-center")
+            input(type="hidden" name="_csrf" value=csrfToken)
+            input(type="text" id="term" name="term" placeholder="Search Properties" class="p-2 rounded-lg shadow")
+            input(type="submit" class="bg-indigo-800 rounded-lg text-sm text-white uppercase font-bold transition-all hover:bg-indigo-400 cursor-pointer p-3" value="Search")
             

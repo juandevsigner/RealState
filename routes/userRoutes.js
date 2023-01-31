@@ -9,12 +9,15 @@ import {
   checkToken,
   newPassword,
   validateUser,
+  logout,
 } from "../controller/userController.js";
 
 const router = Router();
 
 router.get("/login", formLogin);
 router.post("/login", validateUser);
+
+router.post("/logout", logout);
 
 router.get("/register", formRegister);
 router.post("/register", register);

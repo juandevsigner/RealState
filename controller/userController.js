@@ -258,6 +258,10 @@ const validateUser = async (req, res) => {
     .redirect("/properties");
 };
 
+const logout = (req, res) => {
+  return res.clearCookie("_token").status(200).redirect("/auth/login");
+};
+
 export {
   formLogin,
   formRegister,
@@ -268,4 +272,5 @@ export {
   checkToken,
   newPassword,
   validateUser,
+  logout,
 };
