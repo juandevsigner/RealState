@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.leaflet-container a {
+  color: white;
+}
+
+.leaflet-control-zoom-in span {
+  color: black;
+}
+.leaflet-control-zoom-out span {
+  color: black;
+}
+.leaflet-bottom {
+  display: none;
+}
+.leaflet-right {
+  display: none;
+}

@@ -3,6 +3,8 @@ import csurf from "csurf";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/userRoutes.js";
 import propertyRouter from "./routes/propertyRoutes.js";
+import appRouter from "./routes/appRoutes.js";
+import apiRouter from "./routes/apiRoutes.js";
 import db from "./config/db.js";
 
 const app = express();
@@ -25,8 +27,10 @@ app.set("views", "./views");
 app.use(express.static("public"));
 
 //ROUTING
+app.use("/", appRouter);
 app.use("/auth", userRouter);
 app.use("/", propertyRouter);
+app.use("/api", apiRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
