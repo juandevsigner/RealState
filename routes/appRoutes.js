@@ -11,7 +11,7 @@ const router = Router();
 
 router.get("/", home);
 
-router.get("/categories/:id", categories);
+router.get("/category/:id", categories);
 
 router.get("/404", notFound);
 

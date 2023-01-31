@@ -36,7 +36,26 @@ const home = async (req, res) => {
   });
 };
 
-const categories = (req, res) => {};
+const categories = async (req, res) => {
+  const { id } = req.params;
+  const category = await Category.findByPk(id);
+  if (!category) {
+    return res.redirect("/404");
+  }
+
+  const properties = await Property.findAll({
+    where: { categoryID: id },
+    include: [
+      { model: Price, as: "price" },
+      { model: Category, as: "category" },
+    ],
+  });
+
+  res.render("category", {
+    page: `${category.name}s for sale`,
+    properties,
+  });
+};
 
 const notFound = (req, res) => {};
 
